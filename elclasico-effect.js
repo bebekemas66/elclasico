@@ -11,7 +11,7 @@
     const MATCH_INFO = "Senin, 11 Mei 2026 • 02.00 WIB";
 
     const SHOW_BANNER_MS = 6000;   // banner bawah tampil 6 detik
-    const RAIN_DURATION_MS = 6000; // hujan bola aktif 6 detik
+    const RAIN_DURATION_MS = 30000; // hujan bola aktif 6 detik
     const SPAWN_MS = 360;          // interval icon jatuh
     const ENABLE_SWEEP = false;    // sweep putih dimatikan dulu
 
