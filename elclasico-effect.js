@@ -514,7 +514,7 @@
           <div class="team right">
             <div class="name">
               <span class="name-full">Real Madrid</span>
-              <span class="name-short">Real</span>
+              <span class="name-short">Madrid</span>
             </div>
             ${teamLogoHtml("madrid", MADRID_LOGO, "Real Madrid", "R")}
           </div>
