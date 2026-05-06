@@ -6,25 +6,19 @@
     const TEAM_RIGHT = "Real Madrid";
     const MATCH_INFO = "Senin, 11 Mei 2026 • 02.00 WIB";
 
-    // Logo / asset URL
-    const BARCA_LOGO = "";
-    const MADRID_LOGO = "";
-
-    // Icon dekorasi
-    const BALL_ICON = "";
-    const STAR_ICON = "";
-
-    // Audio opsional. Kosongkan kalau tidak mau musik.
-    const AUDIO_URL = "";
-    const AUDIO_VOLUME = 0.35;
+    // Assets dari repo GitHub
+    const BARCA_LOGO = "assets/barcelona.png";
+    const MADRID_LOGO = "assets/real-madrid.png";
+    const BALL_ICON = "assets/ball.png";
 
     // Effect intensity
     const RAMP_DURATION_MS = 30000;
-    const SPAWN_FAST_MS = 260;
-    const SPAWN_SLOW_MS = 850;
+    const SPAWN_FAST_MS = 320;
+    const SPAWN_SLOW_MS = 950;
 
-    let userPaused = false;
-    let audio = null;
+    // ================= PREVENT DOUBLE RUN =================
+    if (window.__GM_ELCLASICO_EFFECT_ACTIVE__) return;
+    window.__GM_ELCLASICO_EFFECT_ACTIVE__ = true;
 
     // ================= STYLE =================
     if (!document.getElementById("gm-elclasico-style")) {
@@ -36,9 +30,19 @@
         #gm-elclasico-sweep,
         #gm-elclasico-toast,
         #gm-elclasico-banner {
-          font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+          box-sizing: border-box;
         }
 
+        #gm-elclasico-overlay *,
+        #gm-elclasico-rain *,
+        #gm-elclasico-sweep *,
+        #gm-elclasico-toast *,
+        #gm-elclasico-banner * {
+          box-sizing: border-box;
+        }
+
+        /* ================= STADIUM OVERLAY ================= */
         #gm-elclasico-overlay {
           position: fixed;
           inset: 0;
@@ -52,9 +56,9 @@
           position: absolute;
           inset: 0;
           background:
-            radial-gradient(circle at 50% 8%, rgba(255,255,255,0.12), transparent 28%),
-            radial-gradient(circle at 50% 100%, rgba(0,0,0,0.35), transparent 45%),
-            linear-gradient(to bottom, rgba(7,12,24,0.08), rgba(0,0,0,0.20));
+            radial-gradient(circle at 50% 5%, rgba(255,255,255,0.12), transparent 26%),
+            radial-gradient(circle at 50% 100%, rgba(0,0,0,0.34), transparent 48%),
+            linear-gradient(to bottom, rgba(6,10,22,0.08), rgba(0,0,0,0.22));
         }
 
         #gm-elclasico-overlay::after {
@@ -64,17 +68,18 @@
           top: -18%;
           transform: translateX(-50%);
           width: 1200px;
-          height: 450px;
+          height: 460px;
           background:
-            radial-gradient(circle at 15% 50%, rgba(255,255,255,0.15), transparent 18%),
-            radial-gradient(circle at 35% 50%, rgba(255,255,255,0.12), transparent 18%),
+            radial-gradient(circle at 15% 50%, rgba(255,255,255,0.14), transparent 18%),
+            radial-gradient(circle at 35% 50%, rgba(255,255,255,0.11), transparent 18%),
             radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18), transparent 18%),
-            radial-gradient(circle at 65% 50%, rgba(255,255,255,0.12), transparent 18%),
-            radial-gradient(circle at 85% 50%, rgba(255,255,255,0.15), transparent 18%);
+            radial-gradient(circle at 65% 50%, rgba(255,255,255,0.11), transparent 18%),
+            radial-gradient(circle at 85% 50%, rgba(255,255,255,0.14), transparent 18%);
           filter: blur(12px);
-          opacity: .75;
+          opacity: .72;
         }
 
+        /* ================= SHINE SWEEP ================= */
         #gm-elclasico-sweep {
           position: fixed;
           inset: 0;
@@ -93,51 +98,56 @@
           background: linear-gradient(
             115deg,
             transparent 0%,
-            rgba(255,255,255,0) 35%,
+            rgba(255,255,255,0) 36%,
             rgba(255,255,255,0.11) 50%,
-            rgba(255,255,255,0) 65%,
+            rgba(255,255,255,0) 64%,
             transparent 100%
           );
           transform: skewX(-12deg);
-          animation: gmElClasicoSweep 14s ease-in-out infinite;
+          animation: gmElClasicoSweep 15s ease-in-out infinite;
         }
 
         @keyframes gmElClasicoSweep {
-          0% { left: -120%; opacity: 0; }
-          8% { opacity: 1; }
-          30% { left: 140%; opacity: 1; }
-          31% { opacity: 0; }
+          0%   { left: -120%; opacity: 0; }
+          8%   { opacity: 1; }
+          30%  { left: 140%; opacity: 1; }
+          31%  { opacity: 0; }
           100% { left: 140%; opacity: 0; }
         }
 
+        /* ================= BOTTOM BANNER ================= */
         #gm-elclasico-banner {
           position: fixed;
           left: 50%;
           bottom: 20px;
           transform: translateX(-50%);
           z-index: 2147483647;
-          width: min(92vw, 760px);
+          width: min(92vw, 780px);
           pointer-events: none;
           animation: gmBannerUp 1s cubic-bezier(.2,.8,.2,1);
         }
 
         #gm-elclasico-banner .box {
           position: relative;
-          display: flex;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          justify-content: space-between;
-          gap: 12px;
+          gap: 14px;
           padding: 16px 18px;
-          border-radius: 22px;
+          border-radius: 24px;
           background:
             linear-gradient(90deg,
-              rgba(0, 77, 152, 0.72) 0%,
-              rgba(70, 18, 35, 0.86) 34%,
-              rgba(16, 16, 20, 0.90) 52%,
-              rgba(220, 220, 220, 0.18) 100%);
+              rgba(0, 77, 152, 0.76) 0%,
+              rgba(165, 0, 68, 0.64) 23%,
+              rgba(14, 14, 18, 0.92) 50%,
+              rgba(236, 236, 236, 0.22) 77%,
+              rgba(212, 175, 55, 0.26) 100%);
           backdrop-filter: blur(14px);
-          border: 1px solid rgba(255,255,255,0.18);
-          box-shadow: 0 18px 40px rgba(0,0,0,0.38);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(255,255,255,0.20);
+          box-shadow:
+            0 18px 42px rgba(0,0,0,0.40),
+            0 0 0 1px rgba(255,255,255,0.06) inset;
           overflow: hidden;
         }
 
@@ -146,11 +156,9 @@
           position: absolute;
           inset: 0;
           background:
-            linear-gradient(90deg,
-              rgba(165, 0, 68, 0.24) 0%,
-              transparent 35%,
-              transparent 65%,
-              rgba(255, 215, 90, 0.12) 100%);
+            radial-gradient(circle at 18% 50%, rgba(255,255,255,0.14), transparent 26%),
+            radial-gradient(circle at 82% 50%, rgba(255,216,107,0.12), transparent 26%),
+            linear-gradient(90deg, rgba(255,255,255,0.08), transparent 35%, transparent 65%, rgba(255,255,255,0.06));
           pointer-events: none;
         }
 
@@ -161,7 +169,6 @@
           align-items: center;
           gap: 10px;
           min-width: 0;
-          flex: 1;
         }
 
         #gm-elclasico-banner .team.right {
@@ -170,28 +177,32 @@
         }
 
         #gm-elclasico-banner .logo {
-          width: 44px;
-          height: 44px;
+          width: 46px;
+          height: 46px;
           border-radius: 999px;
           object-fit: contain;
-          background: rgba(255,255,255,0.95);
-          padding: 4px;
-          box-shadow: 0 0 0 2px rgba(255,255,255,0.10);
+          background: rgba(255,255,255,0.96);
+          padding: 5px;
+          box-shadow:
+            0 8px 18px rgba(0,0,0,0.22),
+            0 0 0 2px rgba(255,255,255,0.12);
           flex: 0 0 auto;
         }
 
         #gm-elclasico-banner .fallback-logo {
-          width: 44px;
-          height: 44px;
+          width: 46px;
+          height: 46px;
           border-radius: 999px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 18px;
-          font-weight: 900;
+          font-weight: 950;
           color: #fff;
+          box-shadow:
+            0 8px 18px rgba(0,0,0,0.22),
+            0 0 0 2px rgba(255,255,255,0.12);
           flex: 0 0 auto;
-          box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
         }
 
         #gm-elclasico-banner .fallback-logo.barca {
@@ -199,15 +210,16 @@
         }
 
         #gm-elclasico-banner .fallback-logo.madrid {
-          background: linear-gradient(135deg, #f7f7f7, #d4af37);
+          background: linear-gradient(135deg, #ffffff, #d4af37);
           color: #1a1a1a;
         }
 
         #gm-elclasico-banner .name {
-          font-weight: 850;
+          font-weight: 900;
           font-size: 18px;
           line-height: 1.1;
-          color: #fff;
+          color: #ffffff;
+          text-shadow: 0 2px 10px rgba(0,0,0,0.38);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -220,33 +232,35 @@
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-width: 170px;
+          min-width: 185px;
           text-align: center;
+          padding: 0 4px;
         }
 
         #gm-elclasico-banner .title {
-          font-size: 20px;
+          font-size: 22px;
           font-weight: 950;
-          letter-spacing: 1px;
+          letter-spacing: 1.2px;
           color: #ffd86b;
-          line-height: 1.1;
-          text-shadow: 0 2px 12px rgba(0,0,0,0.45);
-        }
-
-        #gm-elclasico-banner .info {
-          margin-top: 4px;
-          font-size: 12px;
-          font-weight: 800;
-          color: #f3f3f3;
-          opacity: .96;
+          line-height: 1.05;
+          text-shadow: 0 2px 14px rgba(0,0,0,0.48);
         }
 
         #gm-elclasico-banner .vs {
           margin-top: 4px;
           font-size: 12px;
-          font-weight: 900;
-          color: rgba(255,255,255,0.85);
-          letter-spacing: 1px;
+          font-weight: 950;
+          color: rgba(255,255,255,0.88);
+          letter-spacing: 1.6px;
+        }
+
+        #gm-elclasico-banner .info {
+          margin-top: 4px;
+          font-size: 12px;
+          font-weight: 850;
+          color: #f4f4f4;
+          opacity: .98;
+          white-space: nowrap;
         }
 
         @keyframes gmBannerUp {
@@ -260,6 +274,7 @@
           }
         }
 
+        /* ================= TOP TOAST ================= */
         #gm-elclasico-toast {
           position: fixed;
           left: 50%;
@@ -279,14 +294,30 @@
           gap: 12px;
           padding: 14px 16px;
           border-radius: 18px;
-          background: rgba(10,10,10,.62);
+          background: rgba(10,10,10,.64);
           backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
           border: 1px solid rgba(255,255,255,.18);
-          box-shadow: 0 18px 48px rgba(0,0,0,.45);
+          box-shadow:
+            0 18px 48px rgba(0,0,0,.45),
+            0 0 0 1px rgba(255,255,255,.06) inset;
           overflow: hidden;
         }
 
+        #gm-elclasico-toast .box::before {
+          content: "";
+          position: absolute;
+          inset: -40%;
+          background:
+            radial-gradient(circle at 20% 50%, rgba(0,77,152,.22), transparent 52%),
+            radial-gradient(circle at 72% 45%, rgba(255,216,107,.18), transparent 55%);
+          filter: blur(10px);
+          opacity: .8;
+        }
+
         #gm-elclasico-toast .dot {
+          position: relative;
+          z-index: 1;
           width: 12px;
           height: 12px;
           border-radius: 999px;
@@ -296,30 +327,34 @@
         }
 
         #gm-elclasico-toast .txt {
+          position: relative;
+          z-index: 1;
           display: flex;
           flex-direction: column;
           gap: 3px;
         }
 
         #gm-elclasico-toast .t1 {
-          font: 850 13px/1.1 system-ui, Segoe UI, Arial;
+          font: 850 13px/1.1 system-ui, "Segoe UI", Arial;
+          letter-spacing: .4px;
           color: #f7f1dc;
           margin: 0;
         }
 
         #gm-elclasico-toast .t2 {
-          font: 950 16px/1.1 system-ui, Segoe UI, Arial;
+          font: 950 16px/1.1 system-ui, "Segoe UI", Arial;
           color: #ffd86b;
           margin: 0;
         }
 
         @keyframes gmToastCine {
-          0% { opacity: 0; transform: translateX(-50%) translateY(-22px) scale(.92); filter: blur(2px); }
-          14% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); filter: blur(0); }
-          72% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+          0%   { opacity: 0; transform: translateX(-50%) translateY(-22px) scale(.92); filter: blur(2px); }
+          14%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); filter: blur(0); }
+          72%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
           100% { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(.98); filter: blur(.6px); }
         }
 
+        /* ================= BALL RAIN ================= */
         #gm-elclasico-rain {
           position: fixed;
           inset: 0;
@@ -329,14 +364,26 @@
         }
 
         @keyframes gmFallTop {
-          from { top: -80px; opacity: .95; }
-          to { top: 110vh; opacity: .9; }
+          from {
+            top: -80px;
+            opacity: .95;
+          }
+          to {
+            top: 110vh;
+            opacity: .88;
+          }
         }
 
         @keyframes gmSway {
-          0% { transform: translateX(0) rotate(0deg); }
-          50% { transform: translateX(var(--dx)) rotate(var(--rot)); }
-          100% { transform: translateX(0) rotate(calc(var(--rot) * -1)); }
+          0% {
+            transform: translateX(0) rotate(0deg);
+          }
+          50% {
+            transform: translateX(var(--dx)) rotate(var(--rot));
+          }
+          100% {
+            transform: translateX(0) rotate(calc(var(--rot) * -1));
+          }
         }
 
         #gm-elclasico-rain .fx {
@@ -344,56 +391,66 @@
           left: var(--x);
           top: -80px;
           width: var(--size);
+          height: auto;
           animation:
             gmFallTop var(--dur) linear forwards,
             gmSway var(--sway) ease-in-out infinite;
           will-change: top, transform;
           pointer-events: none;
-          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.20));
+          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.22));
+          user-select: none;
         }
 
-        #gm-audio-btn {
-          position: fixed;
-          right: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 2147483647;
-          padding: 8px 10px;
-          font-size: 14px;
-          line-height: 1;
-          border-radius: 999px;
-          border: none;
-          cursor: pointer;
-          background: rgba(255,215,90,0.95);
-          color: #1a1a1a;
-          outline: 2px solid rgba(255,255,255,0.55);
-          box-shadow: 0 6px 14px rgba(0,0,0,.35);
-        }
-
+        /* ================= MOBILE ================= */
         @media (max-width: 640px) {
           #gm-elclasico-banner {
-            width: min(94vw, 94vw);
+            width: 94vw;
             bottom: 14px;
           }
 
           #gm-elclasico-banner .box {
-            padding: 14px 12px;
-            gap: 8px;
-            border-radius: 18px;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            padding: 14px 14px;
+            border-radius: 20px;
+            text-align: center;
+          }
+
+          #gm-elclasico-banner .team {
+            justify-content: center;
+          }
+
+          #gm-elclasico-banner .team.right {
+            justify-content: center;
+            text-align: center;
+          }
+
+          #gm-elclasico-banner .team.right .name {
+            order: 2;
+          }
+
+          #gm-elclasico-banner .team.right .logo,
+          #gm-elclasico-banner .team.right .fallback-logo {
+            order: 1;
           }
 
           #gm-elclasico-banner .logo,
           #gm-elclasico-banner .fallback-logo {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
           }
 
           #gm-elclasico-banner .name {
-            font-size: 14px;
+            font-size: 15px;
+          }
+
+          #gm-elclasico-banner .center {
+            min-width: 0;
+            order: -1;
           }
 
           #gm-elclasico-banner .title {
-            font-size: 16px;
+            font-size: 18px;
           }
 
           #gm-elclasico-banner .info,
@@ -401,101 +458,50 @@
             font-size: 11px;
           }
 
-          #gm-elclasico-banner .center {
-            min-width: 120px;
+          #gm-elclasico-toast {
+            top: 12px;
+            width: max-content;
+            max-width: 92vw;
+          }
+
+          #gm-elclasico-toast .box {
+            padding: 12px 14px;
+            border-radius: 16px;
+          }
+
+          #gm-elclasico-toast .t2 {
+            font-size: 15px;
           }
         }
       `;
       document.head.appendChild(style);
     }
 
-    // ================= AUDIO =================
-    if (AUDIO_URL) {
-      audio = new Audio(AUDIO_URL);
-      audio.loop = true;
-      audio.preload = "auto";
-      audio.volume = AUDIO_VOLUME;
-
-      document.addEventListener(
-        "touchstart",
-        () => {
-          if (audio && audio.paused && !userPaused) audio.play().catch(() => {});
-        },
-        { once: true }
-      );
-
-      audio.play().catch(() => {
-        const resume = () => {
-          if (!userPaused && audio) audio.play().catch(() => {});
-          window.removeEventListener("click", resume, true);
-          window.removeEventListener("touchstart", resume, true);
-          window.removeEventListener("keydown", resume, true);
-        };
-        window.addEventListener("click", resume, true);
-        window.addEventListener("touchstart", resume, true);
-        window.addEventListener("keydown", resume, true);
-      });
-
-      document.addEventListener("visibilitychange", () => {
-        if (!audio) return;
-
-        if (document.hidden) {
-          if (!audio.paused) audio.pause();
-        } else {
-          if (!userPaused) audio.play().catch(() => {});
-        }
-      });
-
-      if (!document.getElementById("gm-audio-btn")) {
-        const btn = document.createElement("button");
-        btn.id = "gm-audio-btn";
-        btn.textContent = "🔊";
-        btn.setAttribute("aria-label", "Toggle music");
-        document.body.appendChild(btn);
-
-        btn.addEventListener("click", () => {
-          if (!audio) return;
-
-          if (audio.paused) {
-            audio.play().catch(() => {});
-            btn.textContent = "🔊";
-            btn.style.background = "rgba(255,215,90,0.95)";
-            userPaused = false;
-          } else {
-            audio.pause();
-            btn.textContent = "🔇";
-            btn.style.background = "rgba(120,120,120,0.85)";
-            userPaused = true;
-          }
-        });
-      }
-    }
-
-    // ================= OVERLAY =================
+    // ================= CREATE OVERLAY =================
     if (!document.getElementById("gm-elclasico-overlay")) {
       const overlay = document.createElement("div");
       overlay.id = "gm-elclasico-overlay";
       document.body.appendChild(overlay);
     }
 
-    // ================= SWEEP =================
+    // ================= CREATE SWEEP =================
     if (!document.getElementById("gm-elclasico-sweep")) {
       const sweep = document.createElement("div");
       sweep.id = "gm-elclasico-sweep";
       document.body.appendChild(sweep);
     }
 
-    // ================= BANNER =================
+    // ================= CREATE BANNER =================
     if (!document.getElementById("gm-elclasico-banner")) {
       const banner = document.createElement("div");
       banner.id = "gm-elclasico-banner";
 
       const leftLogoHtml = BARCA_LOGO
-        ? `<img class="logo" src="${BARCA_LOGO}" alt="${TEAM_LEFT}">`
+        ? `<img class="logo" src="${BARCA_LOGO}" alt="${TEAM_LEFT}" onerror="this.outerHTML='<div class=&quot;fallback-logo barca&quot;>B</div>'">`
         : `<div class="fallback-logo barca">B</div>`;
 
       const rightLogoHtml = MADRID_LOGO
-        ? `<img class="logo" src="${MADRID_LOGO}" alt="${TEAM_RIGHT}">`
+        ? `<img class="logo" src="${MADRID_LOGO}" alt="${TEAM_RIGHT}" onerror="this.outerHTML='<div class=&quot;fallback-logo madrid&quot;>R</div>'">`
         : `<div class="fallback-logo madrid">R</div>`;
 
       banner.innerHTML = `
@@ -507,7 +513,7 @@
 
           <div class="center">
             <div class="title">${MATCH_TITLE}</div>
-            <div class="vs">VS</div>
+            <div class="vs">BARCELONA VS REAL MADRID</div>
             <div class="info">${MATCH_INFO}</div>
           </div>
 
@@ -521,23 +527,23 @@
       document.body.appendChild(banner);
     }
 
-    // ================= TOAST =================
+    // ================= CREATE TOAST =================
     (function showToastOnce() {
-      if (sessionStorage.getItem("gm_elclasico_toast_v1") === "1") return;
-      sessionStorage.setItem("gm_elclasico_toast_v1", "1");
-
-      const toast = document.createElement("div");
-      toast.id = "gm-elclasico-toast";
+      if (sessionStorage.getItem("gm_elclasico_toast_v2") === "1") return;
+      sessionStorage.setItem("gm_elclasico_toast_v2", "1");
 
       const messages = [
         "Big Match Siap Dimulai",
         "Saatnya Menyambut El Clasico",
         "Duel Panas Barcelona vs Real Madrid",
-        "Hype Pertandingan Sudah Aktif"
+        "Hype Pertandingan Sudah Aktif",
+        "Match Day Vibes Sudah Aktif"
       ];
 
       const subtitle = messages[Math.floor(Math.random() * messages.length)];
 
+      const toast = document.createElement("div");
+      toast.id = "gm-elclasico-toast";
       toast.innerHTML = `
         <div class="box">
           <div class="dot"></div>
@@ -551,10 +557,10 @@
       setTimeout(() => {
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 6800);
-      }, 1800);
+      }, 1500);
     })();
 
-    // ================= RAIN EFFECT =================
+    // ================= BALL RAIN EFFECT =================
     let rainLayer = document.getElementById("gm-elclasico-rain");
 
     if (!rainLayer) {
@@ -563,45 +569,39 @@
       document.body.appendChild(rainLayer);
     }
 
-    function createFallbackIcon(type) {
-      const span = document.createElement("span");
-      span.className = "fx";
-      span.textContent = type === "ball" ? "⚽" : "✨";
-      span.style.fontSize = "var(--size)";
-      span.style.lineHeight = "1";
-      return span;
+    function spawnBall() {
+      if (!BALL_ICON) return;
+
+      const img = document.createElement("img");
+      img.className = "fx";
+      img.src = BALL_ICON;
+      img.alt = "";
+      img.draggable = false;
+      img.onerror = () => img.remove();
+
+      img.style.setProperty("--size", (Math.random() * 16 + 18).toFixed(0) + "px");
+      img.style.setProperty("--x", (Math.random() * 100).toFixed(2) + "vw");
+      img.style.setProperty("--dur", (Math.random() * 2.6 + 4.6).toFixed(2) + "s");
+      img.style.setProperty("--sway", (Math.random() * 1.4 + 2.2).toFixed(2) + "s");
+      img.style.setProperty(
+        "--dx",
+        (Math.random() < 0.5 ? "-" : "") + (Math.random() * 34 + 14).toFixed(0) + "px"
+      );
+      img.style.setProperty(
+        "--rot",
+        (Math.random() < 0.5 ? "-" : "") + (Math.random() * 24 + 10).toFixed(0) + "deg"
+      );
+
+      rainLayer.appendChild(img);
+
+      setTimeout(() => img.remove(), 8500);
     }
 
-    function spawn() {
-      const useBall = Math.random() < 0.65;
-      const hasImage = useBall ? BALL_ICON : STAR_ICON;
-
-      const el = hasImage ? document.createElement("img") : createFallbackIcon(useBall ? "ball" : "star");
-
-      el.className = "fx";
-
-      if (hasImage) {
-        el.src = useBall ? BALL_ICON : STAR_ICON;
-        el.onerror = () => el.remove();
-      }
-
-      el.style.setProperty("--size", (Math.random() * 18 + 18).toFixed(0) + "px");
-      el.style.setProperty("--x", (Math.random() * 100).toFixed(2) + "vw");
-      el.style.setProperty("--dur", (Math.random() * 2.8 + 4.2).toFixed(2) + "s");
-      el.style.setProperty("--sway", (Math.random() * 1.4 + 2.0).toFixed(2) + "s");
-      el.style.setProperty("--dx", (Math.random() < 0.5 ? "-" : "") + (Math.random() * 40 + 18).toFixed(0) + "px");
-      el.style.setProperty("--rot", (Math.random() < 0.5 ? "-" : "") + (Math.random() * 26 + 10).toFixed(0) + "deg");
-
-      rainLayer.appendChild(el);
-
-      setTimeout(() => el.remove(), 8200);
-    }
-
-    let rainTimer = setInterval(spawn, SPAWN_FAST_MS);
+    let rainTimer = setInterval(spawnBall, SPAWN_FAST_MS);
 
     setTimeout(() => {
       clearInterval(rainTimer);
-      rainTimer = setInterval(spawn, SPAWN_SLOW_MS);
+      rainTimer = setInterval(spawnBall, SPAWN_SLOW_MS);
     }, RAMP_DURATION_MS);
   }
 
