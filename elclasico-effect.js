@@ -2,22 +2,34 @@
   function start() {
     // ================= CONFIG =================
     const BASE_URL = "https://bebekemas66.github.io/elclasico";
-    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=2";
-    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=2";
-    const BALL_ICON = BASE_URL + "/ball.png?v=2";
+
+    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=4";
+    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=4";
+    const BALL_ICON = BASE_URL + "/ball.png?v=4";
+    const MUSIC_URL = BASE_URL + "/music.mp3?v=4";
 
     const MATCH_TITLE = "EL CLASICO";
     const MATCH_SUBTITLE = "BARCELONA VS REAL MADRID";
     const MATCH_INFO = "Senin, 11 Mei 2026 • 02.00 WIB";
 
-    const SHOW_BANNER_MS = 10000;   // banner bawah tampil 6 detik
-    const RAIN_DURATION_MS = 30000; // hujan bola aktif 6 detik
-    const SPAWN_MS = 360;          // interval icon jatuh
-    const ENABLE_SWEEP = false;    // sweep putih dimatikan dulu
+    const SHOW_BANNER_MS = 10000;
+    const RAIN_DURATION_MS = 40000;
+    const SPAWN_MS = 360;
+
+    const AUDIO_VOLUME = 0.28;
+    const ENABLE_MUSIC = true;
 
     // ================= PREVENT DOUBLE RUN =================
-    if (window.__GM_ELCLASICO_EFFECT_V2__) return;
-    window.__GM_ELCLASICO_EFFECT_V2__ = true;
+    if (window.__GM_ELCLASICO_EFFECT_V4__) return;
+    window.__GM_ELCLASICO_EFFECT_V4__ = true;
+
+    // Stop old audio if previous version exists
+    if (window.__GM_ELCLASICO_AUDIO__) {
+      try {
+        window.__GM_ELCLASICO_AUDIO__.pause();
+        window.__GM_ELCLASICO_AUDIO__ = null;
+      } catch (e) {}
+    }
 
     // ================= CLEAN OLD ELEMENTS =================
     [
@@ -25,7 +37,8 @@
       "gm-elclasico-overlay",
       "gm-elclasico-sweep",
       "gm-elclasico-banner",
-      "gm-elclasico-rain"
+      "gm-elclasico-rain",
+      "gm-elclasico-audio-btn"
     ].forEach((id) => {
       const old = document.getElementById(id);
       if (old) old.remove();
@@ -37,15 +50,14 @@
     style.textContent = `
       #gm-elclasico-overlay,
       #gm-elclasico-rain,
-      #gm-elclasico-sweep,
-      #gm-elclasico-banner {
+      #gm-elclasico-banner,
+      #gm-elclasico-audio-btn {
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
         box-sizing: border-box;
       }
 
       #gm-elclasico-overlay *,
       #gm-elclasico-rain *,
-      #gm-elclasico-sweep *,
       #gm-elclasico-banner * {
         box-sizing: border-box;
       }
@@ -66,42 +78,6 @@
         background:
           radial-gradient(circle at 50% 8%, rgba(255,255,255,0.08), transparent 26%),
           radial-gradient(circle at 50% 100%, rgba(0,0,0,0.22), transparent 48%);
-      }
-
-      /* ================= OPTIONAL SWEEP ================= */
-      #gm-elclasico-sweep {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 2147483642;
-        overflow: hidden;
-      }
-
-      #gm-elclasico-sweep::before {
-        content: "";
-        position: absolute;
-        top: -25%;
-        left: -120%;
-        width: 55%;
-        height: 150%;
-        background: linear-gradient(
-          115deg,
-          transparent 0%,
-          rgba(255,255,255,0) 42%,
-          rgba(255,255,255,0.08) 50%,
-          rgba(255,255,255,0) 58%,
-          transparent 100%
-        );
-        transform: skewX(-12deg);
-        animation: gmSweep 10s ease-in-out infinite;
-      }
-
-      @keyframes gmSweep {
-        0%   { left: -120%; opacity: 0; }
-        8%   { opacity: .5; }
-        28%  { left: 130%; opacity: .5; }
-        29%  { opacity: 0; }
-        100% { left: 130%; opacity: 0; }
       }
 
       /* ================= BALL RAIN ================= */
@@ -299,11 +275,47 @@
         text-overflow: ellipsis;
       }
 
+      /* ================= AUDIO BUTTON ================= */
+      #gm-elclasico-audio-btn {
+        position: fixed;
+        right: 16px;
+        bottom: 92px;
+        z-index: 2147483647;
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.18);
+        background: rgba(55, 58, 64, .88);
+        color: #ffffff;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow:
+          0 10px 24px rgba(0,0,0,.32),
+          0 0 0 1px rgba(255,255,255,.05) inset;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: transform .18s ease, background .18s ease, opacity .18s ease;
+      }
+
+      #gm-elclasico-audio-btn:hover {
+        transform: translateY(-1px);
+        background: rgba(75, 78, 86, .92);
+      }
+
+      #gm-elclasico-audio-btn.is-muted {
+        background: rgba(70, 70, 74, .82);
+        color: rgba(255,255,255,.72);
+      }
+
       /* ================= MOBILE ================= */
       @media (max-width: 640px) {
         #gm-elclasico-banner {
           width: 92vw;
-          bottom: 82px; /* dinaikkan supaya tidak tabrakan dengan bottom nav */
+          bottom: 82px;
         }
 
         #gm-elclasico-banner .box {
@@ -348,21 +360,108 @@
         #gm-elclasico-banner .name {
           font-size: 12px;
         }
+
+        #gm-elclasico-audio-btn {
+          right: 14px;
+          bottom: 92px;
+          width: 40px;
+          height: 40px;
+          font-size: 17px;
+        }
       }
     `;
     document.head.appendChild(style);
+
+    // ================= MUSIC =================
+    let audio = null;
+    let userMuted = false;
+
+    function setBtnState(btn) {
+      if (!btn || !audio) return;
+
+      if (audio.paused || userMuted) {
+        btn.textContent = "🔇";
+        btn.classList.add("is-muted");
+        btn.setAttribute("aria-label", "Nyalakan musik");
+      } else {
+        btn.textContent = "🔊";
+        btn.classList.remove("is-muted");
+        btn.setAttribute("aria-label", "Matikan musik");
+      }
+    }
+
+    function tryPlay(btn) {
+      if (!audio || userMuted) return;
+
+      audio
+        .play()
+        .then(() => setBtnState(btn))
+        .catch(() => {
+          setBtnState(btn);
+        });
+    }
+
+    if (ENABLE_MUSIC) {
+      audio = new Audio(MUSIC_URL);
+      audio.loop = true;
+      audio.preload = "auto";
+      audio.volume = AUDIO_VOLUME;
+      window.__GM_ELCLASICO_AUDIO__ = audio;
+
+      const audioBtn = document.createElement("button");
+      audioBtn.id = "gm-elclasico-audio-btn";
+      audioBtn.type = "button";
+      audioBtn.textContent = "🔇";
+      audioBtn.className = "is-muted";
+      audioBtn.setAttribute("aria-label", "Nyalakan musik");
+      document.body.appendChild(audioBtn);
+
+      audioBtn.addEventListener("click", function () {
+        if (!audio) return;
+
+        if (audio.paused) {
+          userMuted = false;
+          tryPlay(audioBtn);
+        } else {
+          userMuted = true;
+          audio.pause();
+          setBtnState(audioBtn);
+        }
+      });
+
+      // Attempt autoplay saat masuk website
+      tryPlay(audioBtn);
+
+      // Fallback untuk browser/mobile yang blokir autoplay
+      const resumeOnFirstInteraction = function () {
+        if (!userMuted) tryPlay(audioBtn);
+
+        window.removeEventListener("click", resumeOnFirstInteraction, true);
+        window.removeEventListener("touchstart", resumeOnFirstInteraction, true);
+        window.removeEventListener("keydown", resumeOnFirstInteraction, true);
+      };
+
+      window.addEventListener("click", resumeOnFirstInteraction, true);
+      window.addEventListener("touchstart", resumeOnFirstInteraction, true);
+      window.addEventListener("keydown", resumeOnFirstInteraction, true);
+
+      // Pause saat tab hidden, lanjut saat balik
+      document.addEventListener("visibilitychange", function () {
+        if (!audio) return;
+
+        if (document.hidden) {
+          if (!audio.paused) audio.pause();
+          setBtnState(audioBtn);
+        } else {
+          if (!userMuted) tryPlay(audioBtn);
+        }
+      });
+    }
 
     // ================= OVERLAY =================
     const overlay = document.createElement("div");
     overlay.id = "gm-elclasico-overlay";
     document.body.appendChild(overlay);
-
-    // ================= OPTIONAL SWEEP =================
-    if (ENABLE_SWEEP) {
-      const sweep = document.createElement("div");
-      sweep.id = "gm-elclasico-sweep";
-      document.body.appendChild(sweep);
-    }
 
     // ================= BANNER =================
     const banner = document.createElement("div");
@@ -399,7 +498,6 @@
 
     document.body.appendChild(banner);
 
-    // auto hide banner after 6 sec
     setTimeout(() => {
       banner.classList.add("hide");
       setTimeout(() => {
