@@ -3,25 +3,24 @@
     // ================= CONFIG =================
     const BASE_URL = "https://bebekemas66.github.io/elclasico";
 
-    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=5";
-    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=5";
-    const BALL_ICON = BASE_URL + "/ball.png?v=5";
-    const MUSIC_URL = BASE_URL + "/music.mp3?v=5";
+    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=6";
+    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=6";
+    const BALL_ICON = BASE_URL + "/ball.png?v=6";
+    const MUSIC_URL = BASE_URL + "/music.mp3?v=6";
 
     const MATCH_TITLE = "EL CLASICO";
     const MATCH_SUBTITLE = "BARCELONA VS REAL MADRID";
     const MATCH_INFO = "Senin, 11 Mei 2026 • 02.00 WIB";
 
-    const SHOW_BANNER_MS = 10000;
+    const SHOW_BANNER_MS = 11000;
     const RAIN_DURATION_MS = 40000;
     const SPAWN_MS = 360;
 
-    const ENABLE_MUSIC = true;
     const AUDIO_VOLUME = 0.2;
 
     // ================= PREVENT DOUBLE RUN =================
-    if (window.__GM_ELCLASICO_EFFECT_V5__) return;
-    window.__GM_ELCLASICO_EFFECT_V5__ = true;
+    if (window.__GM_ELCLASICO_EFFECT_V6__) return;
+    window.__GM_ELCLASICO_EFFECT_V6__ = true;
 
     // Stop old audio if previous version exists
     if (window.__GM_ELCLASICO_AUDIO__) {
@@ -294,8 +293,9 @@
         top: 50%;
         transform: translateY(-50%);
         z-index: 2147483647;
-        width: 42px;
-        height: 42px;
+        padding: 8px 10px;
+        min-width: 42px;
+        min-height: 42px;
         border-radius: 999px;
         border: 1px solid rgba(255,255,255,.18);
         background: rgba(55, 58, 64, .88);
@@ -377,10 +377,10 @@
         #gm-elclasico-audio-btn {
           right: 12px;
           top: 50%;
-          bottom: auto;
           transform: translateY(-50%);
-          width: 40px;
-          height: 40px;
+          min-width: 40px;
+          min-height: 40px;
+          padding: 8px 9px;
           font-size: 17px;
         }
 
@@ -391,14 +391,20 @@
     `;
     document.head.appendChild(style);
 
-    // ================= MUSIC =================
-    let audio = null;
-    let userMuted = false;
+    // ================= MUSIC - RAMADHAN STYLE AUTOPLAY SAFE =================
+    const audio = new Audio(MUSIC_URL);
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.volume = AUDIO_VOLUME;
 
-    function setBtnState(btn) {
-      if (!btn || !audio) return;
+    window.__GM_ELCLASICO_AUDIO__ = audio;
 
-      if (audio.paused || userMuted) {
+    let userPaused = false;
+
+    function updateAudioButton(btn) {
+      if (!btn) return;
+
+      if (audio.paused) {
         btn.textContent = "🔇";
         btn.classList.add("is-muted");
         btn.setAttribute("aria-label", "Nyalakan musik");
@@ -409,76 +415,77 @@
       }
     }
 
-    function tryPlay(btn) {
-      if (!audio || userMuted) return;
+    // Mobile hard-fix: play saat tap pertama
+    document.addEventListener(
+      "touchstart",
+      () => {
+        if (audio.paused && !userPaused) {
+          audio.play().catch(() => {});
+        }
+      },
+      { once: true, passive: true }
+    );
 
-      audio
-        .play()
-        .then(() => {
-          setBtnState(btn);
-        })
-        .catch(() => {
-          setBtnState(btn);
-        });
-    }
+    // Autoplay attempt + fallback interaksi pertama
+    audio.play().catch(() => {
+      const resume = () => {
+        if (!userPaused) {
+          audio.play().catch(() => {});
+        }
 
-    if (ENABLE_MUSIC) {
-      audio = new Audio(MUSIC_URL);
-      audio.loop = true;
-      audio.preload = "auto";
-      audio.volume = AUDIO_VOLUME;
-      window.__GM_ELCLASICO_AUDIO__ = audio;
+        const btn = document.getElementById("gm-elclasico-audio-btn");
+        updateAudioButton(btn);
 
+        window.removeEventListener("click", resume, true);
+        window.removeEventListener("touchstart", resume, true);
+        window.removeEventListener("keydown", resume, true);
+      };
+
+      window.addEventListener("click", resume, true);
+      window.addEventListener("touchstart", resume, true);
+      window.addEventListener("keydown", resume, true);
+    });
+
+    // Pause saat tab hidden, resume saat balik, kecuali user mute
+    document.addEventListener("visibilitychange", () => {
+      const btn = document.getElementById("gm-elclasico-audio-btn");
+
+      if (document.hidden) {
+        if (!audio.paused) audio.pause();
+      } else {
+        if (!userPaused) {
+          audio.play().catch(() => {});
+        }
+      }
+
+      updateAudioButton(btn);
+    });
+
+    // ================= BUTTON MUTE / UNMUTE =================
+    if (!document.getElementById("gm-elclasico-audio-btn")) {
       const audioBtn = document.createElement("button");
       audioBtn.id = "gm-elclasico-audio-btn";
       audioBtn.type = "button";
-      audioBtn.textContent = "🔇";
-      audioBtn.className = "is-muted";
-      audioBtn.setAttribute("aria-label", "Nyalakan musik");
+      audioBtn.textContent = "🔊";
+      audioBtn.setAttribute("aria-label", "Toggle music");
       document.body.appendChild(audioBtn);
 
-      audioBtn.addEventListener("click", function () {
-        if (!audio) return;
+      audioBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
 
         if (audio.paused) {
-          userMuted = false;
-          tryPlay(audioBtn);
+          audio.play().catch(() => {});
+          userPaused = false;
         } else {
-          userMuted = true;
           audio.pause();
-          setBtnState(audioBtn);
+          userPaused = true;
         }
+
+        updateAudioButton(audioBtn);
       });
 
-      // Coba autoplay saat halaman masuk
-      tryPlay(audioBtn);
-
-      // Fallback autoplay untuk mobile/browser yang blokir sebelum ada interaksi
-      const resumeOnFirstInteraction = function () {
-        if (!userMuted) {
-          tryPlay(audioBtn);
-        }
-
-        window.removeEventListener("click", resumeOnFirstInteraction, true);
-        window.removeEventListener("touchstart", resumeOnFirstInteraction, true);
-        window.removeEventListener("keydown", resumeOnFirstInteraction, true);
-      };
-
-      window.addEventListener("click", resumeOnFirstInteraction, true);
-      window.addEventListener("touchstart", resumeOnFirstInteraction, true);
-      window.addEventListener("keydown", resumeOnFirstInteraction, true);
-
-      // Pause saat tab hidden, lanjut saat balik
-      document.addEventListener("visibilitychange", function () {
-        if (!audio) return;
-
-        if (document.hidden) {
-          if (!audio.paused) audio.pause();
-          setBtnState(audioBtn);
-        } else {
-          if (!userMuted) tryPlay(audioBtn);
-        }
-      });
+      updateAudioButton(audioBtn);
     }
 
     // ================= OVERLAY =================
