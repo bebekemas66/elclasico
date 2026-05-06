@@ -501,7 +501,7 @@
           <div class="team left">
             ${teamLogoHtml("barca", BARCA_LOGO, "Barcelona", "B")}
             <div class="name">
-              <span class="name-full">Bayern Munchich</span>
+              <span class="name-full">Bayern Munich</span>
               <span class="name-short">Munchen</span>
             </div>
           </div>
