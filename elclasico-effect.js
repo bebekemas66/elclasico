@@ -3,13 +3,13 @@
     // ================= CONFIG =================
     const BASE_URL = "https://bebekemas66.github.io/elclasico";
 
-    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=8";
-    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=8";
+    const BARCA_LOGO = BASE_URL + "/munchen.png?v=8";
+    const MADRID_LOGO = BASE_URL + "/psg.png?v=8";
     const BALL_ICON = BASE_URL + "/ball.png?v=8";
     const MUSIC_URL = BASE_URL + "/music.mp3?v=8";
 
-    const MATCH_TITLE = "EL CLASICO";
-    const MATCH_INFO = "Senin, 11 Mei 2026 • 02.00 WIB";
+    const MATCH_TITLE = "UCL SEMIFINAL";
+    const MATCH_INFO = "Kamis, 7 Mei 2026 • 02.00 WIB";
 
     const SHOW_BANNER_MS = 11000;
     const RAIN_DURATION_MS = 40000;
@@ -501,8 +501,8 @@
           <div class="team left">
             ${teamLogoHtml("barca", BARCA_LOGO, "Barcelona", "B")}
             <div class="name">
-              <span class="name-full">Barcelona</span>
-              <span class="name-short">Barca</span>
+              <span class="name-full">Bayern Munchich</span>
+              <span class="name-short">Munchen</span>
             </div>
           </div>
 
@@ -513,8 +513,8 @@
 
           <div class="team right">
             <div class="name">
-              <span class="name-full">Real Madrid</span>
-              <span class="name-short">Madrid</span>
+              <span class="name-full">PSG</span>
+              <span class="name-short">PSG</span>
             </div>
             ${teamLogoHtml("madrid", MADRID_LOGO, "Real Madrid", "R")}
           </div>
