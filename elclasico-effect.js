@@ -7,9 +7,9 @@
     const MATCH_INFO = "Senin, 11 Mei 2026 • 02.00 WIB";
 
     // Assets dari repo GitHub
-    const BARCA_LOGO = "assets/barcelona.png";
-    const MADRID_LOGO = "assets/real-madrid.png";
-    const BALL_ICON = "assets/ball.png";
+    const BARCA_LOGO = "barcelona.png";
+    const MADRID_LOGO = "real-madrid.png";
+    const BALL_ICON = "ball.png";
 
     // Effect intensity
     const RAMP_DURATION_MS = 30000;
