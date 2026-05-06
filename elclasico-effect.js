@@ -11,7 +11,7 @@
     const MATCH_TITLE = "UCL SEMIFINAL";
     const MATCH_INFO = "Kamis, 7 Mei 2026 • 02.00 WIB";
 
-    const SHOW_BANNER_MS = 11000;
+    const SHOW_BANNER_MS = 13000;
     const RAIN_DURATION_MS = 40000;
     const SPAWN_MS = 360;
 
