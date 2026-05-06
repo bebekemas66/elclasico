@@ -15,7 +15,7 @@
     const RAIN_DURATION_MS = 40000;
     const SPAWN_MS = 360;
 
-    const AUDIO_VOLUME = 0.15;
+    const AUDIO_VOLUME = 0.12;
 
     // ================= PREVENT DOUBLE RUN =================
     if (window.__GM_ELCLASICO_EFFECT_V8__) return;
