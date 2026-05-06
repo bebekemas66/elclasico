@@ -17,7 +17,7 @@
     const SPAWN_MS = 360;
 
     const ENABLE_MUSIC = true;
-    const AUDIO_VOLUME = 0.28;
+    const AUDIO_VOLUME = 0.24;
 
     // ================= PREVENT DOUBLE RUN =================
     if (window.__GM_ELCLASICO_EFFECT_V5__) return;
