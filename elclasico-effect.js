@@ -3,24 +3,23 @@
     // ================= CONFIG =================
     const BASE_URL = "https://bebekemas66.github.io/elclasico";
 
-    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=6";
-    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=6";
-    const BALL_ICON = BASE_URL + "/ball.png?v=6";
-    const MUSIC_URL = BASE_URL + "/music.mp3?v=6";
+    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=7";
+    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=7";
+    const BALL_ICON = BASE_URL + "/ball.png?v=7";
+    const MUSIC_URL = BASE_URL + "/music.mp3?v=7";
 
     const MATCH_TITLE = "EL CLASICO";
-    const MATCH_SUBTITLE = "BARCELONA VS REAL MADRID";
     const MATCH_INFO = "Senin, 11 Mei 2026 • 02.00 WIB";
 
-    const SHOW_BANNER_MS = 11000;
-    const RAIN_DURATION_MS = 40000;
+    const SHOW_BANNER_MS = 6000;
+    const RAIN_DURATION_MS = 6000;
     const SPAWN_MS = 360;
 
-    const AUDIO_VOLUME = 0.2;
+    const AUDIO_VOLUME = 0.28;
 
     // ================= PREVENT DOUBLE RUN =================
-    if (window.__GM_ELCLASICO_EFFECT_V6__) return;
-    window.__GM_ELCLASICO_EFFECT_V6__ = true;
+    if (window.__GM_ELCLASICO_EFFECT_V7__) return;
+    window.__GM_ELCLASICO_EFFECT_V7__ = true;
 
     // Stop old audio if previous version exists
     if (window.__GM_ELCLASICO_AUDIO__) {
@@ -75,8 +74,8 @@
         position: absolute;
         inset: 0;
         background:
-          radial-gradient(circle at 50% 8%, rgba(255,255,255,0.08), transparent 26%),
-          radial-gradient(circle at 50% 100%, rgba(0,0,0,0.20), transparent 48%);
+          radial-gradient(circle at 50% 8%, rgba(255,255,255,0.06), transparent 26%),
+          radial-gradient(circle at 50% 100%, rgba(0,0,0,0.16), transparent 48%);
       }
 
       /* ================= BALL RAIN ================= */
@@ -140,14 +139,14 @@
         filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
       }
 
-      /* ================= BOTTOM MATCH BAR ================= */
+      /* ================= BOTTOM MATCH BAR - COMPACT ================= */
       #gm-elclasico-banner {
         position: fixed;
         left: 50%;
         bottom: 18px;
         transform: translateX(-50%);
         z-index: 2147483647;
-        width: min(92vw, 720px);
+        width: min(92vw, 680px);
         pointer-events: none;
         opacity: 1;
         transition: opacity .45s ease, transform .45s ease;
@@ -160,8 +159,8 @@
 
       #gm-elclasico-banner .box {
         position: relative;
-        padding: 16px 18px 14px;
-        border-radius: 22px;
+        padding: 12px 16px;
+        border-radius: 18px;
         overflow: hidden;
         background:
           linear-gradient(
@@ -173,7 +172,7 @@
           );
         border: 1px solid rgba(255,255,255,0.14);
         box-shadow:
-          0 18px 40px rgba(0,0,0,.35),
+          0 14px 32px rgba(0,0,0,.32),
           0 0 0 1px rgba(255,255,255,.05) inset;
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
@@ -184,57 +183,25 @@
         position: absolute;
         inset: 0;
         background:
-          radial-gradient(circle at 18% 50%, rgba(255,255,255,.10), transparent 26%),
-          radial-gradient(circle at 85% 50%, rgba(255,216,107,.10), transparent 26%);
+          radial-gradient(circle at 18% 50%, rgba(255,255,255,.08), transparent 26%),
+          radial-gradient(circle at 85% 50%, rgba(255,216,107,.08), transparent 26%);
         pointer-events: none;
       }
 
       #gm-elclasico-banner .content {
         position: relative;
         z-index: 1;
-      }
-
-      #gm-elclasico-banner .title {
-        text-align: center;
-        font-size: 19px;
-        font-weight: 950;
-        letter-spacing: 1px;
-        color: #ffd86b;
-        line-height: 1.05;
-        text-shadow: 0 2px 12px rgba(0,0,0,.4);
-      }
-
-      #gm-elclasico-banner .match {
-        margin-top: 6px;
-        text-align: center;
-        font-size: 13px;
-        font-weight: 900;
-        letter-spacing: 1px;
-        color: #ffffff;
-      }
-
-      #gm-elclasico-banner .info {
-        margin-top: 5px;
-        text-align: center;
-        font-size: 11px;
-        font-weight: 800;
-        color: rgba(255,255,255,.95);
-      }
-
-      #gm-elclasico-banner .teams {
-        margin-top: 12px;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
-        justify-content: space-between;
-        gap: 14px;
+        gap: 12px;
       }
 
       #gm-elclasico-banner .team {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         min-width: 0;
-        flex: 1;
       }
 
       #gm-elclasico-banner .team.right {
@@ -243,27 +210,27 @@
       }
 
       #gm-elclasico-banner .logo {
-        width: 42px;
-        height: 42px;
+        width: 38px;
+        height: 38px;
         border-radius: 999px;
         background: rgba(255,255,255,.96);
-        padding: 5px;
+        padding: 4px;
         object-fit: contain;
         flex: 0 0 auto;
-        box-shadow: 0 4px 12px rgba(0,0,0,.22);
+        box-shadow: 0 4px 10px rgba(0,0,0,.20);
       }
 
       #gm-elclasico-banner .fallback-logo {
-        width: 42px;
-        height: 42px;
+        width: 38px;
+        height: 38px;
         border-radius: 999px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 950;
         flex: 0 0 auto;
-        box-shadow: 0 4px 12px rgba(0,0,0,.22);
+        box-shadow: 0 4px 10px rgba(0,0,0,.20);
       }
 
       #gm-elclasico-banner .fallback-logo.barca {
@@ -277,13 +244,36 @@
       }
 
       #gm-elclasico-banner .name {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 900;
         color: #fff;
         line-height: 1.1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+
+      #gm-elclasico-banner .center {
+        text-align: center;
+        min-width: 150px;
+      }
+
+      #gm-elclasico-banner .title {
+        font-size: 15px;
+        font-weight: 950;
+        letter-spacing: .8px;
+        color: #ffd86b;
+        line-height: 1.05;
+        text-shadow: 0 2px 10px rgba(0,0,0,.35);
+      }
+
+      #gm-elclasico-banner .info {
+        margin-top: 4px;
+        font-size: 11px;
+        font-weight: 800;
+        color: rgba(255,255,255,.95);
+        line-height: 1.1;
+        white-space: nowrap;
       }
 
       /* ================= AUDIO BUTTON - RIGHT CENTER ================= */
@@ -327,51 +317,54 @@
       /* ================= MOBILE ================= */
       @media (max-width: 640px) {
         #gm-elclasico-banner {
-          width: 92vw;
+          width: 90vw;
           bottom: 82px;
         }
 
         #gm-elclasico-banner .box {
-          padding: 14px 14px 12px;
-          border-radius: 20px;
+          padding: 10px 12px;
+          border-radius: 16px;
+        }
+
+        #gm-elclasico-banner .content {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+
+        #gm-elclasico-banner .center {
+          order: -1;
+          min-width: 0;
         }
 
         #gm-elclasico-banner .title {
-          font-size: 17px;
-        }
-
-        #gm-elclasico-banner .match {
-          font-size: 11px;
-          letter-spacing: .8px;
+          font-size: 14px;
         }
 
         #gm-elclasico-banner .info {
+          margin-top: 4px;
           font-size: 10px;
         }
 
-        #gm-elclasico-banner .teams {
-          margin-top: 10px;
-          gap: 10px;
-        }
-
         #gm-elclasico-banner .team {
+          justify-content: center;
           gap: 8px;
         }
 
         #gm-elclasico-banner .team.right {
-          justify-content: flex-end;
+          justify-content: center;
+          text-align: center;
         }
 
         #gm-elclasico-banner .logo,
         #gm-elclasico-banner .fallback-logo {
-          width: 36px;
-          height: 36px;
+          width: 34px;
+          height: 34px;
           padding: 4px;
-          font-size: 18px;
+          font-size: 16px;
         }
 
         #gm-elclasico-banner .name {
-          font-size: 12px;
+          font-size: 11px;
         }
 
         #gm-elclasico-audio-btn {
@@ -507,20 +500,19 @@
     banner.innerHTML = `
       <div class="box">
         <div class="content">
-          <div class="title">${MATCH_TITLE}</div>
-          <div class="match">${MATCH_SUBTITLE}</div>
-          <div class="info">${MATCH_INFO}</div>
+          <div class="team left">
+            ${teamLogoHtml("barca", BARCA_LOGO, "Barcelona", "B")}
+            <div class="name">Barcelona</div>
+          </div>
 
-          <div class="teams">
-            <div class="team left">
-              ${teamLogoHtml("barca", BARCA_LOGO, "Barcelona", "B")}
-              <div class="name">Barcelona</div>
-            </div>
+          <div class="center">
+            <div class="title">${MATCH_TITLE}</div>
+            <div class="info">${MATCH_INFO}</div>
+          </div>
 
-            <div class="team right">
-              <div class="name">Real Madrid</div>
-              ${teamLogoHtml("madrid", MADRID_LOGO, "Real Madrid", "R")}
-            </div>
+          <div class="team right">
+            <div class="name">Real Madrid</div>
+            ${teamLogoHtml("madrid", MADRID_LOGO, "Real Madrid", "R")}
           </div>
         </div>
       </div>
