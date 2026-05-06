@@ -3,10 +3,10 @@
     // ================= CONFIG =================
     const BASE_URL = "https://bebekemas66.github.io/elclasico";
 
-    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=4";
-    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=4";
-    const BALL_ICON = BASE_URL + "/ball.png?v=4";
-    const MUSIC_URL = BASE_URL + "/music.mp3?v=4";
+    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=5";
+    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=5";
+    const BALL_ICON = BASE_URL + "/ball.png?v=5";
+    const MUSIC_URL = BASE_URL + "/music.mp3?v=5";
 
     const MATCH_TITLE = "EL CLASICO";
     const MATCH_SUBTITLE = "BARCELONA VS REAL MADRID";
@@ -16,17 +16,18 @@
     const RAIN_DURATION_MS = 40000;
     const SPAWN_MS = 360;
 
-    const AUDIO_VOLUME = 0.28;
     const ENABLE_MUSIC = true;
+    const AUDIO_VOLUME = 0.28;
 
     // ================= PREVENT DOUBLE RUN =================
-    if (window.__GM_ELCLASICO_EFFECT_V4__) return;
-    window.__GM_ELCLASICO_EFFECT_V4__ = true;
+    if (window.__GM_ELCLASICO_EFFECT_V5__) return;
+    window.__GM_ELCLASICO_EFFECT_V5__ = true;
 
     // Stop old audio if previous version exists
     if (window.__GM_ELCLASICO_AUDIO__) {
       try {
         window.__GM_ELCLASICO_AUDIO__.pause();
+        window.__GM_ELCLASICO_AUDIO__.src = "";
         window.__GM_ELCLASICO_AUDIO__ = null;
       } catch (e) {}
     }
@@ -35,7 +36,6 @@
     [
       "gm-elclasico-style",
       "gm-elclasico-overlay",
-      "gm-elclasico-sweep",
       "gm-elclasico-banner",
       "gm-elclasico-rain",
       "gm-elclasico-audio-btn"
@@ -77,7 +77,7 @@
         inset: 0;
         background:
           radial-gradient(circle at 50% 8%, rgba(255,255,255,0.08), transparent 26%),
-          radial-gradient(circle at 50% 100%, rgba(0,0,0,0.22), transparent 48%);
+          radial-gradient(circle at 50% 100%, rgba(0,0,0,0.20), transparent 48%);
       }
 
       /* ================= BALL RAIN ================= */
@@ -90,14 +90,26 @@
       }
 
       @keyframes gmFallTop {
-        from { top: -60px; opacity: .95; }
-        to   { top: 110vh; opacity: .88; }
+        from {
+          top: -60px;
+          opacity: .95;
+        }
+        to {
+          top: 110vh;
+          opacity: .88;
+        }
       }
 
       @keyframes gmSway {
-        0%   { transform: translateX(0) rotate(0deg); }
-        50%  { transform: translateX(var(--dx)) rotate(var(--rot)); }
-        100% { transform: translateX(0) rotate(calc(var(--rot) * -1)); }
+        0% {
+          transform: translateX(0) rotate(0deg);
+        }
+        50% {
+          transform: translateX(var(--dx)) rotate(var(--rot));
+        }
+        100% {
+          transform: translateX(0) rotate(calc(var(--rot) * -1));
+        }
       }
 
       #gm-elclasico-rain .fx {
@@ -275,11 +287,12 @@
         text-overflow: ellipsis;
       }
 
-      /* ================= AUDIO BUTTON ================= */
+      /* ================= AUDIO BUTTON - RIGHT CENTER ================= */
       #gm-elclasico-audio-btn {
         position: fixed;
-        right: 16px;
-        bottom: 92px;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
         z-index: 2147483647;
         width: 42px;
         height: 42px;
@@ -302,7 +315,7 @@
       }
 
       #gm-elclasico-audio-btn:hover {
-        transform: translateY(-1px);
+        transform: translateY(-50%) scale(1.04);
         background: rgba(75, 78, 86, .92);
       }
 
@@ -362,11 +375,17 @@
         }
 
         #gm-elclasico-audio-btn {
-          right: 14px;
-          bottom: 92px;
+          right: 12px;
+          top: 50%;
+          bottom: auto;
+          transform: translateY(-50%);
           width: 40px;
           height: 40px;
           font-size: 17px;
+        }
+
+        #gm-elclasico-audio-btn:hover {
+          transform: translateY(-50%) scale(1.04);
         }
       }
     `;
@@ -395,7 +414,9 @@
 
       audio
         .play()
-        .then(() => setBtnState(btn))
+        .then(() => {
+          setBtnState(btn);
+        })
         .catch(() => {
           setBtnState(btn);
         });
@@ -429,12 +450,14 @@
         }
       });
 
-      // Attempt autoplay saat masuk website
+      // Coba autoplay saat halaman masuk
       tryPlay(audioBtn);
 
-      // Fallback untuk browser/mobile yang blokir autoplay
+      // Fallback autoplay untuk mobile/browser yang blokir sebelum ada interaksi
       const resumeOnFirstInteraction = function () {
-        if (!userMuted) tryPlay(audioBtn);
+        if (!userMuted) {
+          tryPlay(audioBtn);
+        }
 
         window.removeEventListener("click", resumeOnFirstInteraction, true);
         window.removeEventListener("touchstart", resumeOnFirstInteraction, true);
@@ -501,7 +524,9 @@
     setTimeout(() => {
       banner.classList.add("hide");
       setTimeout(() => {
-        if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
+        if (banner && banner.parentNode) {
+          banner.parentNode.removeChild(banner);
+        }
       }, 600);
     }, SHOW_BANNER_MS);
 
