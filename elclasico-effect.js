@@ -3,25 +3,24 @@
     // ================= CONFIG =================
     const BASE_URL = "https://bebekemas66.github.io/elclasico";
 
-    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=7";
-    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=7";
-    const BALL_ICON = BASE_URL + "/ball.png?v=7";
-    const MUSIC_URL = BASE_URL + "/music.mp3?v=7";
+    const BARCA_LOGO = BASE_URL + "/barcelona.png?v=8";
+    const MADRID_LOGO = BASE_URL + "/real-madrid.png?v=8";
+    const BALL_ICON = BASE_URL + "/ball.png?v=8";
+    const MUSIC_URL = BASE_URL + "/music.mp3?v=8";
 
     const MATCH_TITLE = "EL CLASICO";
     const MATCH_INFO = "Senin, 11 Mei 2026 • 02.00 WIB";
 
-    const SHOW_BANNER_MS = 6000;
-    const RAIN_DURATION_MS = 6000;
+    const SHOW_BANNER_MS = 11000;
+    const RAIN_DURATION_MS = 40000;
     const SPAWN_MS = 360;
 
-    const AUDIO_VOLUME = 0.28;
+    const AUDIO_VOLUME = 0.2;
 
     // ================= PREVENT DOUBLE RUN =================
-    if (window.__GM_ELCLASICO_EFFECT_V7__) return;
-    window.__GM_ELCLASICO_EFFECT_V7__ = true;
+    if (window.__GM_ELCLASICO_EFFECT_V8__) return;
+    window.__GM_ELCLASICO_EFFECT_V8__ = true;
 
-    // Stop old audio if previous version exists
     if (window.__GM_ELCLASICO_AUDIO__) {
       try {
         window.__GM_ELCLASICO_AUDIO__.pause();
@@ -30,7 +29,6 @@
       } catch (e) {}
     }
 
-    // ================= CLEAN OLD ELEMENTS =================
     [
       "gm-elclasico-style",
       "gm-elclasico-overlay",
@@ -60,7 +58,6 @@
         box-sizing: border-box;
       }
 
-      /* ================= OVERLAY ================= */
       #gm-elclasico-overlay {
         position: fixed;
         inset: 0;
@@ -74,8 +71,8 @@
         position: absolute;
         inset: 0;
         background:
-          radial-gradient(circle at 50% 8%, rgba(255,255,255,0.06), transparent 26%),
-          radial-gradient(circle at 50% 100%, rgba(0,0,0,0.16), transparent 48%);
+          radial-gradient(circle at 50% 8%, rgba(255,255,255,0.05), transparent 26%),
+          radial-gradient(circle at 50% 100%, rgba(0,0,0,0.13), transparent 48%);
       }
 
       /* ================= BALL RAIN ================= */
@@ -88,26 +85,14 @@
       }
 
       @keyframes gmFallTop {
-        from {
-          top: -60px;
-          opacity: .95;
-        }
-        to {
-          top: 110vh;
-          opacity: .88;
-        }
+        from { top: -60px; opacity: .95; }
+        to   { top: 110vh; opacity: .88; }
       }
 
       @keyframes gmSway {
-        0% {
-          transform: translateX(0) rotate(0deg);
-        }
-        50% {
-          transform: translateX(var(--dx)) rotate(var(--rot));
-        }
-        100% {
-          transform: translateX(0) rotate(calc(var(--rot) * -1));
-        }
+        0%   { transform: translateX(0) rotate(0deg); }
+        50%  { transform: translateX(var(--dx)) rotate(var(--rot)); }
+        100% { transform: translateX(0) rotate(calc(var(--rot) * -1)); }
       }
 
       #gm-elclasico-rain .fx {
@@ -139,7 +124,7 @@
         filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
       }
 
-      /* ================= BOTTOM MATCH BAR - COMPACT ================= */
+      /* ================= COMPACT BANNER ================= */
       #gm-elclasico-banner {
         position: fixed;
         left: 50%;
@@ -159,8 +144,8 @@
 
       #gm-elclasico-banner .box {
         position: relative;
-        padding: 12px 16px;
-        border-radius: 18px;
+        padding: 10px 14px;
+        border-radius: 16px;
         overflow: hidden;
         background:
           linear-gradient(
@@ -172,7 +157,7 @@
           );
         border: 1px solid rgba(255,255,255,0.14);
         box-shadow:
-          0 14px 32px rgba(0,0,0,.32),
+          0 12px 28px rgba(0,0,0,.30),
           0 0 0 1px rgba(255,255,255,.05) inset;
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
@@ -183,8 +168,8 @@
         position: absolute;
         inset: 0;
         background:
-          radial-gradient(circle at 18% 50%, rgba(255,255,255,.08), transparent 26%),
-          radial-gradient(circle at 85% 50%, rgba(255,216,107,.08), transparent 26%);
+          radial-gradient(circle at 18% 50%, rgba(255,255,255,.07), transparent 26%),
+          radial-gradient(circle at 85% 50%, rgba(255,216,107,.07), transparent 26%);
         pointer-events: none;
       }
 
@@ -194,7 +179,7 @@
         display: grid;
         grid-template-columns: 1fr auto 1fr;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
       }
 
       #gm-elclasico-banner .team {
@@ -210,8 +195,8 @@
       }
 
       #gm-elclasico-banner .logo {
-        width: 38px;
-        height: 38px;
+        width: 34px;
+        height: 34px;
         border-radius: 999px;
         background: rgba(255,255,255,.96);
         padding: 4px;
@@ -221,13 +206,13 @@
       }
 
       #gm-elclasico-banner .fallback-logo {
-        width: 38px;
-        height: 38px;
+        width: 34px;
+        height: 34px;
         border-radius: 999px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 950;
         flex: 0 0 auto;
         box-shadow: 0 4px 10px rgba(0,0,0,.20);
@@ -244,7 +229,7 @@
       }
 
       #gm-elclasico-banner .name {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 900;
         color: #fff;
         line-height: 1.1;
@@ -259,7 +244,7 @@
       }
 
       #gm-elclasico-banner .title {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 950;
         letter-spacing: .8px;
         color: #ffd86b;
@@ -268,15 +253,15 @@
       }
 
       #gm-elclasico-banner .info {
-        margin-top: 4px;
-        font-size: 11px;
+        margin-top: 3px;
+        font-size: 10px;
         font-weight: 800;
         color: rgba(255,255,255,.95);
         line-height: 1.1;
         white-space: nowrap;
       }
 
-      /* ================= AUDIO BUTTON - RIGHT CENTER ================= */
+      /* ================= AUDIO BUTTON ================= */
       #gm-elclasico-audio-btn {
         position: fixed;
         right: 14px;
@@ -314,57 +299,64 @@
         color: rgba(255,255,255,.72);
       }
 
-      /* ================= MOBILE ================= */
+      /* ================= MOBILE HORIZONTAL COMPACT ================= */
       @media (max-width: 640px) {
         #gm-elclasico-banner {
-          width: 90vw;
-          bottom: 82px;
+          width: 88vw;
+          bottom: 86px;
         }
 
         #gm-elclasico-banner .box {
-          padding: 10px 12px;
-          border-radius: 16px;
+          padding: 8px 9px;
+          border-radius: 15px;
         }
 
         #gm-elclasico-banner .content {
-          grid-template-columns: 1fr;
-          gap: 8px;
-        }
-
-        #gm-elclasico-banner .center {
-          order: -1;
-          min-width: 0;
-        }
-
-        #gm-elclasico-banner .title {
-          font-size: 14px;
-        }
-
-        #gm-elclasico-banner .info {
-          margin-top: 4px;
-          font-size: 10px;
+          grid-template-columns: 1fr auto 1fr;
+          gap: 6px;
         }
 
         #gm-elclasico-banner .team {
-          justify-content: center;
-          gap: 8px;
+          gap: 5px;
         }
 
         #gm-elclasico-banner .team.right {
-          justify-content: center;
-          text-align: center;
+          justify-content: flex-end;
         }
 
         #gm-elclasico-banner .logo,
         #gm-elclasico-banner .fallback-logo {
-          width: 34px;
-          height: 34px;
-          padding: 4px;
-          font-size: 16px;
+          width: 28px;
+          height: 28px;
+          padding: 3px;
+          font-size: 13px;
         }
 
         #gm-elclasico-banner .name {
-          font-size: 11px;
+          font-size: 10px;
+          max-width: 54px;
+        }
+
+        #gm-elclasico-banner .name-full {
+          display: none;
+        }
+
+        #gm-elclasico-banner .name-short {
+          display: inline;
+        }
+
+        #gm-elclasico-banner .center {
+          min-width: 112px;
+        }
+
+        #gm-elclasico-banner .title {
+          font-size: 12px;
+          letter-spacing: .55px;
+        }
+
+        #gm-elclasico-banner .info {
+          margin-top: 3px;
+          font-size: 8.8px;
         }
 
         #gm-elclasico-audio-btn {
@@ -381,10 +373,20 @@
           transform: translateY(-50%) scale(1.04);
         }
       }
+
+      @media (min-width: 641px) {
+        #gm-elclasico-banner .name-short {
+          display: none;
+        }
+
+        #gm-elclasico-banner .name-full {
+          display: inline;
+        }
+      }
     `;
     document.head.appendChild(style);
 
-    // ================= MUSIC - RAMADHAN STYLE AUTOPLAY SAFE =================
+    // ================= MUSIC =================
     const audio = new Audio(MUSIC_URL);
     audio.loop = true;
     audio.preload = "auto";
@@ -408,7 +410,6 @@
       }
     }
 
-    // Mobile hard-fix: play saat tap pertama
     document.addEventListener(
       "touchstart",
       () => {
@@ -419,7 +420,6 @@
       { once: true, passive: true }
     );
 
-    // Autoplay attempt + fallback interaksi pertama
     audio.play().catch(() => {
       const resume = () => {
         if (!userPaused) {
@@ -439,7 +439,6 @@
       window.addEventListener("keydown", resume, true);
     });
 
-    // Pause saat tab hidden, resume saat balik, kecuali user mute
     document.addEventListener("visibilitychange", () => {
       const btn = document.getElementById("gm-elclasico-audio-btn");
 
@@ -454,7 +453,6 @@
       updateAudioButton(btn);
     });
 
-    // ================= BUTTON MUTE / UNMUTE =================
     if (!document.getElementById("gm-elclasico-audio-btn")) {
       const audioBtn = document.createElement("button");
       audioBtn.id = "gm-elclasico-audio-btn";
@@ -502,7 +500,10 @@
         <div class="content">
           <div class="team left">
             ${teamLogoHtml("barca", BARCA_LOGO, "Barcelona", "B")}
-            <div class="name">Barcelona</div>
+            <div class="name">
+              <span class="name-full">Barcelona</span>
+              <span class="name-short">Barca</span>
+            </div>
           </div>
 
           <div class="center">
@@ -511,7 +512,10 @@
           </div>
 
           <div class="team right">
-            <div class="name">Real Madrid</div>
+            <div class="name">
+              <span class="name-full">Real Madrid</span>
+              <span class="name-short">Real</span>
+            </div>
             ${teamLogoHtml("madrid", MADRID_LOGO, "Real Madrid", "R")}
           </div>
         </div>
