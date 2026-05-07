@@ -1,26 +1,73 @@
 (function () {
-  function start() {
-    // ================= CONFIG =================
+  async function start() {
+    // ================= BASE CONFIG =================
     const BASE_URL = "https://bebekemas66.github.io/elclasico";
+    const CONFIG_VERSION = "9";
 
-    const BARCA_LOGO = BASE_URL + "/liverpool.png?v=8";
-    const MADRID_LOGO = BASE_URL + "/chelsea.png?v=8";
-    const BALL_ICON = BASE_URL + "/ball.png?v=8";
-    const MUSIC_URL = BASE_URL + "/music.mp3?v=8";
+    const CONFIG_URL = BASE_URL + "/match-config.json?v=" + CONFIG_VERSION;
 
-    const MATCH_TITLE = "PREMIER LEAGUE";
-    const MATCH_INFO = "SABTU, 9 Mei 2026 • 18.30 WIB";
+    const FALLBACK_CONFIG = {
+      matchTitle: "PREMIER LEAGUE",
+      matchInfo: "SABTU, 09 Mei 2026 • 18.30 WIB",
 
-    const SHOW_BANNER_MS = 13000;
+      homeTeam: "Liverpool",
+      homeTeamShort: "Liverpool",
+
+      awayTeam: "Chelsea",
+      awayTeamShort: "Chelsea",
+
+      homeLogo: "liverpool.png",
+      awayLogo: "chelsea.png",
+
+      ballIcon: "ball.png",
+      music: "music.mp3"
+    };
+
+    const SHOW_BANNER_MS = 11000;
     const RAIN_DURATION_MS = 40000;
     const SPAWN_MS = 360;
-
-    const AUDIO_VOLUME = 0.12;
+    const AUDIO_VOLUME = 0.1;
 
     // ================= PREVENT DOUBLE RUN =================
-    if (window.__GM_ELCLASICO_EFFECT_V8__) return;
-    window.__GM_ELCLASICO_EFFECT_V8__ = true;
+    if (window.__GM_ELCLASICO_EFFECT_V9__) return;
+    window.__GM_ELCLASICO_EFFECT_V9__ = true;
 
+    // ================= LOAD MATCH CONFIG =================
+    async function loadMatchConfig() {
+      try {
+        const res = await fetch(CONFIG_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error("Config not found");
+        const data = await res.json();
+        return Object.assign({}, FALLBACK_CONFIG, data);
+      } catch (err) {
+        console.warn("[GM ElClasico] Failed to load match-config.json, using fallback config.", err);
+        return FALLBACK_CONFIG;
+      }
+    }
+
+    const cfg = await loadMatchConfig();
+
+    function assetUrl(filename) {
+      if (!filename) return "";
+      if (/^https?:\/\//i.test(filename)) return filename;
+      return BASE_URL + "/" + filename.replace(/^\/+/, "") + "?v=" + CONFIG_VERSION;
+    }
+
+    const MATCH_TITLE = cfg.matchTitle || FALLBACK_CONFIG.matchTitle;
+    const MATCH_INFO = cfg.matchInfo || FALLBACK_CONFIG.matchInfo;
+
+    const HOME_TEAM = cfg.homeTeam || FALLBACK_CONFIG.homeTeam;
+    const HOME_TEAM_SHORT = cfg.homeTeamShort || HOME_TEAM;
+
+    const AWAY_TEAM = cfg.awayTeam || FALLBACK_CONFIG.awayTeam;
+    const AWAY_TEAM_SHORT = cfg.awayTeamShort || AWAY_TEAM;
+
+    const HOME_LOGO = assetUrl(cfg.homeLogo);
+    const AWAY_LOGO = assetUrl(cfg.awayLogo);
+    const BALL_ICON = assetUrl(cfg.ballIcon);
+    const MUSIC_URL = assetUrl(cfg.music);
+
+    // ================= STOP OLD AUDIO =================
     if (window.__GM_ELCLASICO_AUDIO__) {
       try {
         window.__GM_ELCLASICO_AUDIO__.pause();
@@ -29,6 +76,7 @@
       } catch (e) {}
     }
 
+    // ================= CLEAN OLD ELEMENTS =================
     [
       "gm-elclasico-style",
       "gm-elclasico-overlay",
@@ -218,12 +266,12 @@
         box-shadow: 0 4px 10px rgba(0,0,0,.20);
       }
 
-      #gm-elclasico-banner .fallback-logo.barca {
+      #gm-elclasico-banner .fallback-logo.home {
         background: linear-gradient(135deg, #004D98, #A50044);
         color: #fff;
       }
 
-      #gm-elclasico-banner .fallback-logo.madrid {
+      #gm-elclasico-banner .fallback-logo.away {
         background: linear-gradient(135deg, #ffffff, #e6cf76);
         color: #1a1a1a;
       }
@@ -488,8 +536,12 @@
     const banner = document.createElement("div");
     banner.id = "gm-elclasico-banner";
 
+    function firstLetter(text, fallback) {
+      return (text || fallback || "?").trim().charAt(0).toUpperCase();
+    }
+
     function teamLogoHtml(type, src, alt, letter) {
-      const cls = type === "barca" ? "barca" : "madrid";
+      const cls = type === "home" ? "home" : "away";
       return `
         <img class="logo" src="${src}" alt="${alt}" onerror="this.outerHTML='<div class=&quot;fallback-logo ${cls}&quot;>${letter}</div>'">
       `;
@@ -499,10 +551,10 @@
       <div class="box">
         <div class="content">
           <div class="team left">
-            ${teamLogoHtml("barca", BARCA_LOGO, "Barcelona", "B")}
+            ${teamLogoHtml("home", HOME_LOGO, HOME_TEAM, firstLetter(HOME_TEAM, "H"))}
             <div class="name">
-              <span class="name-full">Liverpool</span>
-              <span class="name-short">Liverpool</span>
+              <span class="name-full">${HOME_TEAM}</span>
+              <span class="name-short">${HOME_TEAM_SHORT}</span>
             </div>
           </div>
 
@@ -513,10 +565,10 @@
 
           <div class="team right">
             <div class="name">
-              <span class="name-full">Chelsea</span>
-              <span class="name-short">Chelsea</span>
+              <span class="name-full">${AWAY_TEAM}</span>
+              <span class="name-short">${AWAY_TEAM_SHORT}</span>
             </div>
-            ${teamLogoHtml("madrid", MADRID_LOGO, "Real Madrid", "R")}
+            ${teamLogoHtml("away", AWAY_LOGO, AWAY_TEAM, firstLetter(AWAY_TEAM, "A"))}
           </div>
         </div>
       </div>
