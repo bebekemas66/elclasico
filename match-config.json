@@ -1,0 +1,16 @@
+{
+  "matchTitle": "PREMIER LEAGUE",
+  "matchInfo": "SABTU, 09 Mei 2026 • 18.30 WIB",
+
+  "homeTeam": "Liverpool",
+  "homeTeamShort": "Liverpool",
+
+  "awayTeam": "Chelsea",
+  "awayTeamShort": "Chelsea",
+
+  "homeLogo": "liverpool.png",
+  "awayLogo": "chelsea.png",
+
+  "ballIcon": "ball.png",
+  "music": "music.mp3"
+}
