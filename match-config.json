@@ -1,15 +1,15 @@
 {
-  "matchTitle": "PREMIER LEAGUE",
-  "matchInfo": "SABTU, 09 Mei 2026 • 18.30 WIB",
+  "matchTitle": "EL CLASICO",
+  "matchInfo": "SENIN, 11 Mei 2026 • 02.00 WIB",
 
-  "homeTeam": "Liverpool",
-  "homeTeamShort": "Liverpool",
+  "homeTeam": "Barcelona ",
+  "homeTeamShort": "Barca",
 
-  "awayTeam": "Chelsea",
-  "awayTeamShort": "Chelsea",
+  "awayTeam": "Real Madrid",
+  "awayTeamShort": "Madrid",
 
-  "homeLogo": "liverpool.png",
-  "awayLogo": "chelsea.png",
+  "homeLogo": "barcelona.png",
+  "awayLogo": "real-madrid.png",
 
   "ballIcon": "ball.png",
   "music": "music.mp3"
